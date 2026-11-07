@@ -1,6 +1,6 @@
 #include "cini.h"
 
-const char* ciniLoad(const char* filename) {
+int ciniLoad(Cini *cini, const char* filename) {
     FILE* f = fopen(filename, "r");
     char buffer[2048];
 
@@ -9,16 +9,15 @@ const char* ciniLoad(const char* filename) {
     }
     
     fclose(f);
-    return "e";
+    return 0;
 }   
 
-// int getInt(const char *key, const char *value, int fallback) {
-//     FILE* file = 
-// }
+int ciniGetInt(const Cini *cini, const char *value, int fallback) {
+    
+}
 
 int main(void) {
-    const char* init = ciniLoad("example.ini");
-    printf("\ninit: %s", init);
-    // int width = getInt("", "", 0);
+    Cini cini;
+    ciniLoad(&cini, "example.ini");
     return 0;
 }
