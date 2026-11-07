@@ -6,8 +6,9 @@
 
 #include <stdbool.h>
 
-/* Store the key and value pairs */
+/* Store the section, key and value pairs */
 typedef struct {
+    char section[MAX_LINE_LEN];
     char key[MAX_LINE_LEN];
     char value[MAX_LINE_LEN];
 } CiniItem;
@@ -19,10 +20,10 @@ typedef struct {
     int count;
 } Cini;
 
-int ciniLoad(Cini *cini, const char* filename);
-int ciniGetInt(const Cini *cini, const char *key, int fallback);
-float ciniGetfloat(const Cini *cini, const char *key, float fallback);
-const char* ciniGet(const Cini *cini, const char* key, const char* fallback);
-bool ciniGetBool(const Cini *cini, const char* key, bool fallback);
+int ciniLoad(Cini *cini, const char *filename);
+const char* ciniGet(const Cini *cini, const char *section, const char *key, const char *fallback);
+int ciniGetInt(const Cini *cini, const char *section, const char *key, int fallback);
+float ciniGetFloat(const Cini *cini, const char *section, const char *key, float fallback);
+bool ciniGetBool(const Cini *cini, const char *section, const char *key, bool fallback);
 
 #endif

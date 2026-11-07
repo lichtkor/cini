@@ -24,15 +24,23 @@ int ciniLoad(Cini *cini, const char* filename) {
         return 0;
     }
 
+    char current_section[MAX_LINE_LEN] = "";
     char buffer[2048];
     while(fgets(buffer, sizeof(buffer), f)) {
         /* remove newlines */
         buffer[strcspn(buffer, "\r\n")] = 0;
-
         char* line = trim(buffer);
 
         /* parsing comments */
         if (line[0] == '\0' || line[0] == '#' || line[0] == ';') {
+            continue;
+        }
+
+        /* check for section header */
+        if (line[0] == '[' && line[strlen(line) - 1] == ']') {
+            strncpy(current_section, line + 1, sizeof(current_section) - 1);
+            current_section[strlen(current_section) - 1] = '\0';
+            trim(current_section);
             continue;
         }
 
@@ -43,7 +51,14 @@ int ciniLoad(Cini *cini, const char* filename) {
             char* key = trim(line);
             char* val = trim(eq + 1);
 
+            size_t val_len = strlen(val);
+            if (val_len >= 2 && val[0] == '"' && val[val_len - 1] == '"') {
+                val[val_len - 1] = '\0';
+                val++;
+            }
+
             if (cini->count < MAX_ITEMS) {
+                strncpy(cini->items[cini->count].section, current_section, MAX_LINE_LEN - 1);
                 strncpy(cini->items[cini->count].key, key, MAX_LINE_LEN - 1);
                 strncpy(cini->items[cini->count].value, val, MAX_LINE_LEN - 1);
                 cini->count++;
@@ -55,36 +70,38 @@ int ciniLoad(Cini *cini, const char* filename) {
     return 1;
 }   
 
-int ciniGetInt(const Cini *cini, const char *key, int fallback) {
+static int find_item(const Cini *cini, const char *section, const char *key) {
+    const char *sec = section ? section : "";
     for (int i = 0; i < cini->count; i++) {
-        if (strcmp(cini->items[i].key, key) == 0) {
-            /* convert the string into an int using atoi */
-            return atoi(cini->items[i].value);
+        if (strcmp(cini->items[i].section, sec) == 0 && strcmp(cini->items[i].key, key) == 0) {
+            return i;
         }
+    }
+    return -1;
+}
+
+const char* ciniGet(const Cini *cini, const char *section, const char *key, const char* fallback) {
+    int idx = find_item(cini, section, key);
+    if (idx != -1) {
+        return cini->items[idx].value;
     }
     return fallback;
 }
 
-float ciniGetfloat(const Cini *cini, const char *key, float fallback) {
-    for (int i = 0; i < cini->count; i++) {
-        if (strcmp(cini->items[i].key, key) == 0) {
-            return atof(cini->items[i].value);
-        }
-    }
-    return fallback;
+int ciniGetInt(const Cini *cini, const char *section, const char *key, int fallback) {
+    const char *val = ciniGet(cini, section, key, NULL);
+    if (!val) return fallback;
+    return atoi(val);
 }
 
-const char* ciniGet(const Cini *cini, const char* key, const char* fallback) {
-    for (int i = 0; i < cini->count; i++) {
-        if (strcmp(cini->items[i].key, key) == 0) {
-            return cini->items[i].value;
-        }
-    }
-    return fallback;
+float ciniGetFloat(const Cini *cini, const char *section, const char *key, float fallback) {
+    const char *val = ciniGet(cini, section, key, NULL);
+    if (!val) return fallback;
+    return (float)atof(val);
 }
 
-bool ciniGetBool(const Cini *cini, const char *key, bool fallback) {
-    const char *val = ciniGet(cini, key, false);
+bool ciniGetBool(const Cini *cini, const char *section, const char *key, bool fallback) {
+    const char *val = ciniGet(cini, section, key, NULL);
     if (!val) return fallback;
 
     if (strcmp(val, "true") == 0 || strcmp(val, "yes") == 0 || strcmp(val, "on") == 0 || strcmp(val, "1") == 0) {
