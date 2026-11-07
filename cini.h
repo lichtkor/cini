@@ -4,6 +4,8 @@
 #define MAX_ITEMS 100
 #define MAX_LINE_LEN 256
 
+#include <stdbool.h>
+
 /* Store the key and value pairs */
 typedef struct {
     char key[MAX_LINE_LEN];
@@ -17,7 +19,10 @@ typedef struct {
     int count;
 } Cini;
 
-int ciniLoad(Cini* cini, const char* filename);
+int ciniLoad(Cini *cini, const char* filename);
 int ciniGetInt(const Cini *cini, const char *key, int fallback);
+float ciniGetfloat(const Cini *cini, const char *key, float fallback);
+const char* ciniGet(const Cini *cini, const char* key, const char* fallback);
+bool ciniGetBool(const Cini *cini, const char* key, bool fallback);
 
 #endif
