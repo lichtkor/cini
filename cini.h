@@ -4,8 +4,6 @@
 #define MAX_ITEMS 100
 #define MAX_LINE_LEN 256
 
-#include <stdio.h>
-
 /* Store the key and value pairs */
 typedef struct {
     char key[MAX_LINE_LEN];
