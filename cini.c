@@ -112,3 +112,53 @@ bool ciniGetBool(const Cini *cini, const char *section, const char *key, bool fa
     }
     return fallback;
 }
+
+void ciniSet(Cini *cini, const char *section, const char *key, const char *value) {
+    const char *sec = section ? section : "";
+
+    /* check for existing key in section */
+    for (int i = 0; i < cini->count; i++) {
+        if (strcmp(cini->items[i].section, sec) == 0 && strcmp(cini->items[i].key, key) == 0) {
+            strncpy(cini->items[i].value, value, MAX_LINE_LEN - 1);
+            return;
+        }
+    }
+    
+    if (cini->count < MAX_ITEMS) {
+        strncpy(cini->items[cini->count].section, sec, MAX_LINE_LEN - 1);
+        strncpy(cini->items[cini->count].key, key, MAX_LINE_LEN - 1);
+        strncpy(cini->items[cini->count].value, value, MAX_LINE_LEN - 1);
+        cini->count++;
+    }
+}
+
+void ciniSetInt(Cini *cini, const char *section, const char *key, int value) {
+    char buf[32];
+    snprintf(buf, sizeof(buf), "%d", value);
+    ciniSet(cini, section, key, buf);
+}
+
+int ciniSave(const Cini *cini, const char *filename) {
+    const char *fname = filename ? filename : cini->filename;
+    FILE *f = fopen(fname, "w");
+    if (!f) {
+        return 0;
+    }
+
+    char last_section[MAX_LINE_LEN] = "CINI_NONE";
+
+    for (int i = 0; i < cini->count; i++) {
+        if (strcmp(cini->items[i].section, last_section) != 0) {
+            strcpy(last_section, cini->items[i].section);
+            if (strlen(last_section) > 0) {
+                fprintf(f, "\n[%s]\n", last_section);
+            } else if (i > 0) {
+                fprintf(f, "\n");
+            }
+        }
+        fprintf(f, "%s = %s\n", cini->items[i].key, cini->items[i].value);
+    }
+
+    fclose(f);
+    return 1;
+}

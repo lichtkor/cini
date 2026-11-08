@@ -25,5 +25,8 @@ const char* ciniGet(const Cini *cini, const char *section, const char *key, cons
 int ciniGetInt(const Cini *cini, const char *section, const char *key, int fallback);
 float ciniGetFloat(const Cini *cini, const char *section, const char *key, float fallback);
 bool ciniGetBool(const Cini *cini, const char *section, const char *key, bool fallback);
+void ciniSet(Cini *cini, const char *section, const char *key, const char *value);
+void ciniSetInt(Cini *cini, const char *section, const char *key, int value);
+int ciniSave(const Cini *cini, const char *filename);
 
 #endif

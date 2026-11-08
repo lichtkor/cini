@@ -5,36 +5,21 @@ int main(void) {
     Cini cini;
 
     if (!ciniLoad(&cini, "example.ini")) {
-        printf("Error: could not open example.ini\n");
+        printf("Error opening file\n");
         return 1;
     }
 
-    printf("Loaded %s successfully and %d keys\n", cini.filename, cini.count);
+    ciniSetInt(&cini, "renderer", "width", 2560);
+    ciniSet(&cini, "renderer", "vsync", "false");
 
-    // no section
-    const char* app_name = ciniGet(&cini, NULL, "app_name", "DefaultApp");
+    ciniSet(&cini, "audio", "device", "Headphones"); 
 
-    // [renderer] section
-    int width = ciniGetInt(&cini, "renderer", "width", 800);
-    int height = ciniGetInt(&cini, "renderer", "height", 600);
-    float pi = ciniGetFloat(&cini, "renderer", "pi", 3.14f);
-    bool vsync = ciniGetBool(&cini, "renderer", "vsync", false);
+    printf("Updated width: %d\n", ciniGetInt(&cini, "renderer", "width", 800));
+    printf("Updated audio device: %s\n", ciniGet(&cini, "audio", "device", "Default"));
 
-    // [audio] section
-    float volume = ciniGetFloat(&cini, "audio", "volume", 1.0f);
-    bool muted = ciniGetBool(&cini, "audio", "muted", true);
-    const char* debug_mode = ciniGet(&cini, "audio", "debug_mode", "off");
-
-    printf("app_name: %s\n", app_name);
-    printf("[Renderer]\n");
-    printf("width: %d\n", width);
-    printf("height: %d\n", height);
-    printf("pi: %f\n", pi);
-    printf("vsync: %d\n", vsync);
-    printf("[Audio]\n");
-    printf("volume: %f\n", volume);
-    printf("muted: %d\n", muted);
-    printf("debug_mode: %s\n", debug_mode);
+    if (ciniSave(&cini, "example.ini")) {
+        printf("\nSuccessfully saved changes to 'example.ini'!\n");
+    }
 
     return 0;
 }
