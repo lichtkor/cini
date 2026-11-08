@@ -1,5 +1,5 @@
-#ifndef INI_HPP
-#define INI_HPP
+#ifndef CINI_HPP
+#define CINI_HPP
 
 #include <fstream>
 #include <string>
@@ -9,7 +9,7 @@
 #include <algorithm>
 #include <cctype>
 
-namespace Ini {
+namespace Cini {
 
 enum class ErrorCode {
     Success = 0,

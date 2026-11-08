@@ -1,7 +1,8 @@
-#include "Ini.hpp"
+#include "Cini.hpp"
+#include <iostream>
 
 int main() {
-    Ini::Ini ini;
+    Cini::Ini ini;
     ini.load("example.ini");
 
     int width = ini.get<int>("settings", "width", 1920);
